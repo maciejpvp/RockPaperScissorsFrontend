@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Game } from "./components/Game";
 
 export const App = () => {
-  const [gameId, setGameId] = useState<string>("");
+  const [gameId, setGameId] = useState<string>("123");
   const [clicked, setClicked] = useState<boolean>(false);
   const [waiting, setWaiting] = useState<boolean>(false);
 
