@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Game } from "./components/Game";
 
 export const App = () => {
-  const [gameId, setGameId] = useState<string>("123");
+  const [gameId, setGameId] = useState<string>("");
   const [clicked, setClicked] = useState<boolean>(false);
   const [waiting, setWaiting] = useState<boolean>(false);
 
@@ -25,16 +25,8 @@ export const App = () => {
       setGameId(roomId);
     });
 
-    socket.on(
-      "results",
-      ({ message, oppMove }: { message: string; oppMove: string }) => {
-        console.log(message, oppMove);
-      }
-    );
-
     return () => {
       socket.off("lobby-created");
-      socket.off("results");
     };
   }, []);
 

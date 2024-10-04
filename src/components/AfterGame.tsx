@@ -4,19 +4,32 @@ import Scissors from "../rps-icons/scissors.png";
 import { motion } from "framer-motion";
 import { Move } from "../types";
 import { ChoiceCoin } from "./ChoiceCoin";
-import { useState } from "react";
+import { useEffect } from "react";
+import socket from "../socket";
 
 type AfterGameProps = {
   icon: Move;
+  message: string | undefined;
+  oppMove: string | undefined;
 };
 
-export const AfterGame = ({ icon }: AfterGameProps) => {
-  const [message, setMessage] = useState<string | undefined>();
-
+export const AfterGame = ({ icon, message, oppMove }: AfterGameProps) => {
   const AfterGameVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
   };
+
+  // useEffect(() => {
+  //   socket.on("results", ({ message, oppMove }: resultsProps) => {
+  //     setMessage(message);
+  //     setOppMove(oppMove);
+  //   });
+  //   return () => {
+  //     socket.off("results");
+  //   };
+  // }, []);
+
+  console.log(oppMove);
 
   return (
     <div className="flex flex-row w-[900px] justify-center">
@@ -36,7 +49,9 @@ export const AfterGame = ({ icon }: AfterGameProps) => {
             <h1 className={`font-semibold ${message ? "text-2xl" : "text-md"}`}>
               {message ? message : "Waiting for Opponent"}
             </h1>
-            {message && <p className="text-lg">1-0</p>}
+            {message && (
+              <p className="text-lg">{message === "You Won" ? "1-0" : "0-1"}</p>
+            )}
           </div>
           {message && (
             <button className="bg-stone-950 px-6 py-3 rounded-lg mb-10">
@@ -44,7 +59,17 @@ export const AfterGame = ({ icon }: AfterGameProps) => {
             </button>
           )}
         </div>
-        <ChoiceCoin choice="?" />
+        <ChoiceCoin
+          choice={
+            oppMove
+              ? oppMove === "rock"
+                ? Rock
+                : oppMove === "paper"
+                  ? Paper
+                  : Scissors
+              : "?"
+          }
+        />
       </motion.div>
     </div>
   );

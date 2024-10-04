@@ -20,10 +20,12 @@ export const GameButton = ({
 }: GameButtonProps) => {
   const handleSentMove = () => {
     onSelect(value);
-    socket.emit("make-move", {
-      choice: value,
-      room: gameId,
-    });
+    setTimeout(() => {
+      socket.emit("make-move", {
+        choice: value,
+        room: gameId,
+      });
+    }, 400);
   };
 
   const boxVariants = {
@@ -37,7 +39,7 @@ export const GameButton = ({
     <>
       <motion.button
         onClick={handleSentMove}
-        className="bg-stone-800 p-10 rounded-full relative overflow-visible"
+        className="bg-stone-800 p-10 rounded-full relative overflow-visible caret-transparent"
         initial="hidden"
         animate={isSelected ? "main" : "visible"}
         exit="exit"
