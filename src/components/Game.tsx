@@ -2,7 +2,7 @@ import Rock from "../rps-icons/rock.png";
 import Paper from "../rps-icons/paper.png";
 import Scissors from "../rps-icons/scissors.png";
 import { GameButton } from "./GameButton";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 // import { AfterGame } from "./AfterGame";
 import socket from "../socket";
 import { Move } from "../types";
@@ -11,13 +11,23 @@ import { AfterGame } from "./AfterGame";
 export type resultsProps = {
   message: string;
   oppMove: Move;
+  yourPoints: number;
+  oppPoints: number;
 };
 
-export const Game = ({ gameId }: { gameId: string }) => {
+export const Game = ({
+  gameId,
+  setGameId,
+}: {
+  gameId: string;
+  setGameId: React.Dispatch<SetStateAction<string>>;
+}) => {
   const [selected, setSelected] = useState<Move>(undefined);
   const [showAfterGame, setShowAfterGame] = useState<boolean>(false);
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [oppMove, setOppMove] = useState<string | undefined>(undefined);
+  const [yourPoints, setYourPoints] = useState<number | undefined>(undefined);
+  const [oppPoints, setOppPoints] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (selected && ["rock", "paper", "scissors"].includes(selected))
@@ -27,14 +37,26 @@ export const Game = ({ gameId }: { gameId: string }) => {
   }, [selected]);
 
   useEffect(() => {
-    socket.on("results", ({ message, oppMove }: resultsProps) => {
-      console.log("213213123213");
-      setMessage(message);
-      setOppMove(oppMove);
+    socket.on(
+      "results",
+      ({ message, oppMove, yourPoints, oppPoints }: resultsProps) => {
+        setMessage(message);
+        setOppMove(oppMove);
+        setYourPoints(yourPoints);
+        setOppPoints(oppPoints);
+      },
+    );
+
+    socket.on("play-again-accepted", () => {
+      setSelected(undefined);
+      setShowAfterGame(false);
+      setMessage(undefined);
+      setOppMove(undefined);
     });
+
     return () => {
       socket.off("results");
-      console.log("Resoults Closed");
+      socket.off("play-again-accepted");
     };
   }, []);
 
@@ -70,7 +92,15 @@ export const Game = ({ gameId }: { gameId: string }) => {
             />
           )}
         {showAfterGame && (
-          <AfterGame icon={selected} message={message} oppMove={oppMove} />
+          <AfterGame
+            icon={selected}
+            message={message}
+            oppMove={oppMove}
+            gameId={gameId}
+            setGameId={setGameId}
+            yourPoints={yourPoints}
+            oppPoints={oppPoints}
+          />
         )}
       </div>
     </>
